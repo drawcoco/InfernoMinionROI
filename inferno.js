@@ -6,6 +6,7 @@ INSTA_BUY = 0;
 INSTA_SELL = 1;
 COMPACTOR = 0;
 
+
 items = {
   // prix achat - prix vente - htmlElement display
   "GLOWSTONE_DUST_DISTILLATE": [1, 1, null],
