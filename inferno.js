@@ -29,11 +29,17 @@ items = {
   "INFERNO_APEX": [1, 1, null],
   "VERY_CRUDE_GABAGOOL": [1, 1, null]
 };
-
+// Link [2] to each line in html
 for(var key in items) {
   items[key][2] = document.getElementsByClassName(key)[0];
 }
 
+// Function for adding space of big numbers
+function numberWithSpaces(x) {
+  var parts = x.toString().split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " "); //I dont understand this regex but it works
+  return parts.join(".");
+}
 
 fetch('https://sky.shiiyu.moe/api/v2/profile/drawcoco')
 .then(response => {
@@ -59,7 +65,7 @@ fetch('https://api.hypixel.net/v2/skyblock/bazaar')
     for (var key in items) {
       items[key][0] = Math.round(data['products'][key]['quick_status']['sellPrice'] * 10) / 10;
       items[key][1] = Math.round(data['products'][key]['quick_status']['buyPrice'] * 10) / 10;
-      items[key][2].innerHTML = items[key][0] + " | " + items[key][1];
+      items[key][2].innerHTML = numberWithSpaces(items[key][0]) + " | " + numberWithSpaces(items[key][1]);
     }
 
     calcTable(0, 0, 0);
