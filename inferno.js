@@ -30,11 +30,10 @@ items = {
   "INFERNO_APEX": [1, 1, null],
   "VERY_CRUDE_GABAGOOL": [1, 1, null]
 };
-
+// Link [2] to each line in html
 for(var key in items) {
   items[key][2] = document.getElementsByClassName(key)[0];
 }
-
 
 fetch('https://sky.shiiyu.moe/api/v2/profile/drawcoco')
 .then(response => {
