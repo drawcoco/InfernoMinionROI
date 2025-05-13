@@ -1,21 +1,147 @@
-html, body {
-  background-color: #010101;
-  -webkit-text-fill-color: #f7f7f7;
+:root {
+  --nightBg: #110f1a;
+  --nightTxt: #fde8e9;
+  --nightBrd: #221e34;
+  --nightTbl: #626c66;
+  
+  --lightBg: #f7f0e2;
+  --lightTxt: #002447;
+  --lightBrd: #339989;
+  --lightTbl: #6e7271;
+  
+  --sliderBg: #b0b0b0;
+  --sliderChk: #79B791;
+  
+  --toggleMoonBrd: #d8d8da;
+  --toggleMoonBg: #e8e8ea;
+  --toggleNightBrd: #5d6baa;
+  --toggleNightBg: #808fc7;  
+  
+  --toggleSunBrd: #f5eb71;
+  --toggleSunBg: #fffaa8;  
+  --toggleLightBrd: #72cce3;
+  --toggleLightBg: #96dcee;
+}
+
+/* Gestion jour / nuit */
+
+.toggle_theme {
+  display: none;
+}
+
+.toggle_label {
+  width: 50px;
+  height: 50px;
+  background: var(--toggleNightBg);
+  border-radius: 100px;
+  border: 2px solid var(--toggleNightBrd);
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.toggle_label::before {
+  transition: all 250ms ease-in;
+  content: '';
+  width: 30px;
+  height: 30px;
+  border: 4px solid var(--toggleMoonBrd);
+  top: 6px;
+  right: 6px;
+  position: absolute;
+  border-radius: 82px;
+  background: var(--toggleMoonBg);
+}
+
+.toggle_label:after {
+  transition: all 250ms ease-in;
+  position: absolute;
+  content: '';
+  box-shadow: #d0d0da -8px 6px 0 3px, #d0d0da -3px 1px 0 1px;
+  right: 24px;
+  top: 13px;
+  width: 2px;
+  height: 2px;
+  background: transparent;
+  border-radius: 50%;
+  opacity: 1;
+}
+
+.toggle_theme:checked + .toggle_label {
+  border-color: var(--toggleLightBrd);
+  background: var(--toggleLightBg);
+}
+
+.toggle_theme:checked + .toggle_label:before {
+  border-color: var(--toggleSunBrd);
+  background: var(--toggleSunBg);
+}
+
+.toggle_theme:checked + .toggle_label:after {
+  animation: rotation 200ms linear;
+  opacity: 0;
+}
+
+.toggle_theme:checked ~ .background {
+    background-color: var(--lightBg);
+    color: var(--lightTxt);
+}
+
+.toggle_theme:checked~ .background .values {
+  background-color: var(--lightBrd);
+}
+
+.toggle_theme:checked~.background .box {
+  background-color: var(--lightBg);
+  border-bottom: solid var(--lightBrd) 3px;
+  border-right: solid var(--lightBrd) 3px;
+}
+
+.toggle_theme:checked~.background .tableau {
+  background-color: var(--lightTbl);
+}
+
+.toggle_theme:checked~.background .tbl {
+  background-color: var(--lightBg);
+}
+
+/* Affichage */
+
+.background {
+  background-color: var(--nightBg);
+  color: var(--nightTxt);
   margin: 0;
   padding: 0;
   font-family: "Gill Sans", sans-serif;
-} 
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  z-index: -1;
+  transition: all 200ms ease-in;
+}
 
+.tbl {
+  background-color: var(--nightBg);
+  transition: all 200ms ease-in;
+}
 
 .float-left {
-  width: 20vw;
+  width: 22vw;
   float: left;
   padding: 10px;
 }
 
 .values {
   border-radius: 6px;
-  background-color: #834cab;
+  background-color: var(--nightBrd);
+  transition: all 200ms ease-in;
+}
+
+.box_title {
+  display: inline-block;
+  width: 10vw;
 }
 
 .float-right {
@@ -24,26 +150,27 @@ html, body {
 }
 
 .box {
-  background-color: #010101;
+  background-color: var(--nightBg);
   border-radius: 0px 0px 10px 0px;
-  border-bottom: solid #834cab 3px;
-  border-right: solid #834cab 3px;
+  border-bottom: solid var(--nightBrd) 3px;
+  border-right: solid var(--nightBrd) 3px;
   padding: 5px;
+  transition: all 200ms ease-in;
 }
 
 .tableau {
-  background-color: #444444;
+  background-color: var(--nightTbl);
+  transition: all 200ms ease-in;
 }
 
 .texte {
-  -webkit-text-fill-color: #01d449;
   position: relative;
   top: 8px;
   padding: 10px;
 }
 
 .nbrMinion {
-  -webkit-text-fill-color: #010101;
+  -webkit-text-fill-color: var(--nightBrd);
   margin: 5px;
   width: 50px;
 }
@@ -101,11 +228,11 @@ html, body {
 }
 
 input:checked + .slider {
-  background-color: #01d449;
+  background-color: #79B791;
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px #01d449;
+  box-shadow: 0 0 1px #79B791;
 }
 
 input:checked + .slider:before {
@@ -121,4 +248,9 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+@keyframes rotation {
+  from {top: 13px;}
+  to {top:26px;}
 }

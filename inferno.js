@@ -5,7 +5,9 @@ CATCHER = 0;
 INSTA_BUY = 0;
 INSTA_SELL = 1;
 COMPACTOR = 0;
+FORMAT = 0
 
+suffix = ["", "k", "m", "b"];
 
 items = {
   // prix achat - prix vente - htmlElement display
@@ -34,18 +36,6 @@ items = {
 for(var key in items) {
   items[key][2] = document.getElementsByClassName(key)[0];
 }
-
-fetch('https://sky.shiiyu.moe/api/v2/profile/drawcoco')
-.then(response => {
-  if (!response.ok) {
-    throw new Error('counldn\'t call API');
-  }
-  return response.json();
-})
-.then(data => {
-  console.log(data);
-})
-
 
 fetch('https://api.hypixel.net/v2/skyblock/bazaar')
   .then(response => {
@@ -124,17 +114,6 @@ instasellCheckbox.addEventListener('change', (event) => {
   calcTable()
 })
 
-function nbrMinionChanged(event) {
-  console.log(event);
-  if (event.value == "") {
-    NBR_MINION = 0;
-  }
-  else {
-    NBR_MINION = parseInt(event.value);
-  }
-  calcTable()
-}
-
 const compactorCheckbox = document.getElementsByClassName('compactor')[0];
 compactorCheckbox.addEventListener('change', (event) => {
   if (event.currentTarget.checked) {
@@ -146,6 +125,60 @@ compactorCheckbox.addEventListener('change', (event) => {
   calcTable()
 })
 
+const FormatCheckbox = document.getElementsByClassName('format')[0];
+FormatCheckbox.addEventListener('change', (event) => {
+  if (event.currentTarget.checked) {
+    FORMAT = 1;
+  }
+  else {
+    FORMAT = 0;
+  }
+  calcTable()
+})
+
+function formatNombre(nb) {
+  lvl = 0;
+  signe = 1;
+
+  if (!FORMAT)
+    return (nb)
+
+  if (nb < 0) {
+    signe = -1;
+    nb *= -1;
+  }
+  while (nb > 1000 && lvl < 3)
+  {
+    nb /= 1000;
+    lvl++;
+  }
+  nb = Math.round(nb*10*signe) / 10;
+  return ( nb + suffix[lvl]);
+}
+
+function deFormatNombre(nb) {
+  if (!FORMAT || (Number.isInteger(nb*10)))
+    return (parseFloat(nb));
+  
+  test = nb.substr(-1, 1);
+  lvl = suffix.indexOf(test);
+  if (lvl > 0) {
+    nb = nb.substr(0, nb.length - 1);
+    nb *= (1000**lvl);
+  }
+  return (nb);
+}
+
+function nbrMinionChanged(event) {
+  if (event.value == "") {
+    NBR_MINION = 0;
+  }
+  else {
+    NBR_MINION = parseInt(event.value);
+  }
+  calcTable()
+}
+
 function calcTable()
 {
   minVal = 9999999;
@@ -155,8 +188,8 @@ function calcTable()
   var rows = tableau.rows;
 
   //-------------------- HEADER -------------------
-  head = ["tier", "", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", ""];
-  for(let a = 0; a < 14; a++) {
+  head = ["Tier", "", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"];
+  for(let a = 0; a < 13; a++) {
     rows[0].cells[a].innerHTML = head[a];
   }
 
@@ -172,14 +205,14 @@ function calcTable()
     if (a > 1 && a < 13) {
       gabagoolGenerated = 24*60*60 / (speed[a-2]); // PARTIE GENERATION GABAGOOL BASE
 
-        rows[1].cells[a].innerHTML = Math.round((
+        rows[1].cells[a].innerHTML = formatNombre(Math.round((
           gabagoolGenerated * items["CRUDE_GABAGOOL"][INSTA_SELL]
           - EYEDROP * items["CAPSAICIN_EYEDROPS_NO_CHARGES"][INSTA_BUY] // PRIX CAPSAICIN EYEDROP
-        ) * 10) / 10;// ARRONDI A 0.1 PRES
-      if (parseFloat(rows[1].cells[a].innerHTML) < minVal)
-        minVal = parseFloat(rows[1].cells[a].innerHTML);
-      if (parseFloat(rows[1].cells[a].innerHTML) > maxVal)
-        maxVal = parseFloat(rows[1].cells[a].innerHTML);
+        ) * 10) / 10);// ARRONDI A 0.1 PRES
+      if (deFormatNombre(rows[1].cells[a].innerHTML) < minVal)
+        minVal = deFormatNombre(rows[1].cells[a].innerHTML);
+      if (deFormatNombre(rows[1].cells[a].innerHTML) > maxVal)
+        maxVal = deFormatNombre(rows[1].cells[a].innerHTML);
     }
   }
   
@@ -199,18 +232,18 @@ function calcTable()
       if (a > 1 && a < 13) {
         let gabagoolGenerated = 1/5 * 24*60*60 / (speed[a-2] / 10) // PARTIE GENERATION GABAGOOL BASE
         gabagoolGenerated += (b == 2 ? 4/5 * 24*60*60 / (speed[a-2] / 10) : 0) // PARTIE GENERATION GABAGOOL BASE
-        rows[3 + b].cells[a].innerHTML = Math.round((
+        rows[3 + b].cells[a].innerHTML = formatNombre(Math.round((
           (b != 2 ? 4/5 * 24*60*60 / (speed[a-2] / 10) * items[elements[b][1]][INSTA_SELL] : 0) // PARTIE GENERATION FUEL
           + (COMPACTOR ?
             Math.floor(gabagoolGenerated/192) * items["VERY_CRUDE_GABAGOOL"][INSTA_SELL] + gabagoolGenerated%192 * items["CRUDE_GABAGOOL"][INSTA_SELL] :
             gabagoolGenerated * items["CRUDE_GABAGOOL"][INSTA_SELL]) // PARTIE GENERATION GABAGOOL BASE
           - (6*items[elements[b][2]][INSTA_BUY] + items["FUEL_GABAGOOL"][INSTA_BUY] + 2*items["INFERNO_FUEL_BLOCK"][INSTA_BUY]) // PRIX PARTIE CRAFT FUEL
           - EYEDROP * items["CAPSAICIN_EYEDROPS_NO_CHARGES"][INSTA_BUY] // PRIX CAPSAICIN EYEDROP
-        ) * 10 ) / 10; // ARRONDI A 0.1 PRES
-        if (parseFloat(rows[3 + b].cells[a].innerHTML) < minVal)
-          minVal = parseFloat(rows[3 + b].cells[a].innerHTML);
-        if (parseFloat(rows[3 + b].cells[a].innerHTML) > maxVal)
-          maxVal = parseFloat(rows[3 + b].cells[a].innerHTML);
+        ) * 10 ) / 10); // ARRONDI A 0.1 PRES
+        if (deFormatNombre(rows[3 + b].cells[a].innerHTML) < minVal)
+          minVal = deFormatNombre(rows[3 + b].cells[a].innerHTML);
+        if (deFormatNombre(rows[3 + b].cells[a].innerHTML) > maxVal)
+          maxVal = deFormatNombre(rows[3 + b].cells[a].innerHTML);
       }
     }
   }
@@ -222,21 +255,20 @@ function calcTable()
     rows[9 + b].cells[1].innerHTML = elements[b][0];
     for(let a = 0; a < 14; a++) {
       if (a > 1 && a < 13) {
-        COMPACTOR ? console.log("on") : console.log("off")
         let gabagoolGenerated = 1/5 * 24*60*60 / (speed[a-2] / 15) // PARTIE GENERATION GABAGOOL BASE
         gabagoolGenerated += (b == 2 ? 4/5 * 24*60*60 / (speed[a-2] / 15) : 0) // PARTIE GENERATION GABAGOOL BASE
-        rows[9 + b].cells[a].innerHTML = Math.round((
+        rows[9 + b].cells[a].innerHTML = formatNombre(Math.round((
           (b != 2 ? 4/5 * 24*60*60 / (speed[a-2] / 15) * items[elements[b][1]][INSTA_SELL] : 0) // PARTIE GENERATION FUEL
           + (COMPACTOR ?
             Math.floor(gabagoolGenerated/192) * items["VERY_CRUDE_GABAGOOL"][INSTA_SELL] + gabagoolGenerated%192 * items["CRUDE_GABAGOOL"][INSTA_SELL] :
             gabagoolGenerated * items["CRUDE_GABAGOOL"][INSTA_SELL]) // PARTIE GENERATION GABAGOOL BASE
           - (6*items[elements[b][2]][INSTA_BUY] + items["HEAVY_GABAGOOL"][INSTA_BUY] + 2*items["INFERNO_FUEL_BLOCK"][INSTA_BUY]) // PRIX PARTIE CRAFT FUEL
           - EYEDROP * items["CAPSAICIN_EYEDROPS_NO_CHARGES"][INSTA_BUY] // PRIX CAPSAICIN EYEDROP
-        ) * 10 ) / 10; // ARRONDI A 0.1 PRES
-        if (parseFloat(rows[9 + b].cells[a].innerHTML) < minVal)
-          minVal = parseFloat(rows[9 + b].cells[a].innerHTML);
-        if (parseFloat(rows[9 + b].cells[a].innerHTML) > maxVal)
-          maxVal = parseFloat(rows[9 + b].cells[a].innerHTML);
+        ) * 10 ) / 10); // ARRONDI A 0.1 PRES
+        if (deFormatNombre(rows[9 + b].cells[a].innerHTML) < minVal)
+          minVal = deFormatNombre(rows[9 + b].cells[a].innerHTML);
+        if (deFormatNombre(rows[9 + b].cells[a].innerHTML) > maxVal)
+          maxVal = deFormatNombre(rows[9 + b].cells[a].innerHTML);
       }
     }
   }
@@ -250,7 +282,7 @@ function calcTable()
       if (a > 1 && a < 13) {
         let gabagoolGenerated = 1/5 * 24*60*60 / (speed[a-2] / 20) // PARTIE GENERATION GABAGOOL BASE
         gabagoolGenerated += (b == 2 ? 4/5 * 24*60*60 / (speed[a-2] / 20) : 0) // PARTIE GENERATION GABAGOOL BASE
-        rows[15 + b].cells[a].innerHTML = Math.round((
+        rows[15 + b].cells[a].innerHTML = formatNombre(Math.round((
           (b != 2 ? 4/5 * 24*60*60 / (speed[a-2] / 20) * items[elements[b][1]][INSTA_SELL] : 0) // PARTIE GENERATION FUEL
           + (COMPACTOR ?
             Math.floor(gabagoolGenerated/192) * items["VERY_CRUDE_GABAGOOL"][INSTA_SELL] + gabagoolGenerated%192 * items["CRUDE_GABAGOOL"][INSTA_SELL] :
@@ -261,33 +293,32 @@ function calcTable()
           + 1/16364 * 24*60*60 / (speed[a-2] / 20) * items["INFERNO_VERTEX"][INSTA_SELL] // VERTEX
           + (a > 10 ? 2 : 1) * (1 + 0.3*EYEDROP) * 1/1570909 * 24*60*60 / (speed[a-2] / 20) * items["INFERNO_APEX"][INSTA_SELL] // APEX
           - EYEDROP * items["CAPSAICIN_EYEDROPS_NO_CHARGES"][INSTA_BUY] // PRIX CAPSAICIN EYEDROP
-        ) * 10 ) / 10; // ARRONDI A 0.1 PRES
-        if (parseFloat(rows[15 + b].cells[a].innerHTML) < minVal)
-          minVal = parseFloat(rows[15 + b].cells[a].innerHTML);
-        if (parseFloat(rows[15 + b].cells[a].innerHTML) > maxVal)
-          maxVal = parseFloat(rows[15 + b].cells[a].innerHTML);
+        ) * 10 ) / 10); // ARRONDI A 0.1 PRES
+        if (deFormatNombre(rows[15 + b].cells[a].innerHTML) < minVal)
+          minVal = deFormatNombre(rows[15 + b].cells[a].innerHTML);
+        if (deFormatNombre(rows[15 + b].cells[a].innerHTML) > maxVal)
+          maxVal = deFormatNombre(rows[15 + b].cells[a].innerHTML);
       }
     }
   }
-
-
+  
   n = Math.PI / 10;
-
+  
   for (let b = 0; b < 20; b++) {
-    for (let a = 0; a < 14; a++) {
+    for (let a = 0; a < 13; a++) {
       if (b == 0 || b == 2 || b == 8 || b == 14) {
-        rows[b].cells[a].style.backgroundColor = "rgb(1, 1, 1)";
+        // Lignes fuel
       }
       else {
-        if (a == 0 || a == 1 || a == 13) {
-          rows[b].cells[a].style.backgroundColor = "rgb(1, 1, 1)";
+        if (a == 0 || a == 1) {
+          // colonne entete
         }
         else {
-          val = parseFloat(rows[b].cells[a].innerHTML);
+          val = deFormatNombre(rows[b].cells[a].innerHTML);
           if (val < 0)
             rows[b].cells[a].style.backgroundColor = "rgb(" + (176 + (249-176) * Math.pow(val / minVal, n))  + ", " + (176 + (38-176) * Math.pow(val / minVal, n)) + ", " + (176 + (9-176) * Math.pow(val / minVal, n)) + ")";
           else
-          rows[b].cells[a].style.backgroundColor = "rgb(" + (176 + (1-176) * Math.pow(val / maxVal, n))  + ", " + (176 + (212-176) * Math.pow(val / maxVal, n)) + ", " + (176 + (73-176) * Math.pow(val / maxVal, n)) + ")";
+            rows[b].cells[a].style.backgroundColor = "rgb(" + (176 + (1-176) * Math.pow(val / maxVal, n))  + ", " + (176 + (212-176) * Math.pow(val / maxVal, n)) + ", " + (176 + (73-176) * Math.pow(val / maxVal, n)) + ")";
         }
       }
     }
