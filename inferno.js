@@ -66,8 +66,6 @@ fetch('https://api.hypixel.net/v2/skyblock/bazaar')
     for (var key in items) {
       items[key][0] = Math.round(data['products'][key]['quick_status']['sellPrice'] * 10) / 10;
       items[key][1] = Math.round(data['products'][key]['quick_status']['buyPrice'] * 10) / 10;
-      console.log(key);
-      console.log(items)
       items[key][2].innerHTML = numberWithSpaces(items[key][0]) + " | " + numberWithSpaces(items[key][1]);
     }
 
@@ -86,7 +84,7 @@ eyedropCheckbox.addEventListener('change', (event) => {
   else {
     EYEDROP = 0;
   }
-  calcTable()
+  calcTable();
 })
 
 const infusCheckbox = document.getElementsByClassName('mythrilInfusion')[0];
@@ -97,7 +95,7 @@ infusCheckbox.addEventListener('change', (event) => {
   else {
     INFUS = 0;
   }
-  calcTable()
+  calcTable();
 })
 
 const catcherCheckbox = document.getElementsByClassName('flyCatcher')[0];
@@ -108,7 +106,7 @@ catcherCheckbox.addEventListener('change', (event) => {
   else {
     CATCHER = 0;
   }
-  calcTable()
+  calcTable();
 })
 const freeWillCheckbox = document.getElementsByClassName('freeWill')[0];
 freeWillCheckbox.addEventListener('change', (event) => {
@@ -118,7 +116,7 @@ freeWillCheckbox.addEventListener('change', (event) => {
   else {
     FREE_WILL = 0;
   }
-  calcTable()
+  calcTable();
 })
 const postCardCheckbox = document.getElementsByClassName('postCard')[0];
 postCardCheckbox.addEventListener('change', (event) => {
@@ -128,7 +126,7 @@ postCardCheckbox.addEventListener('change', (event) => {
   else {
     POST_CARD = 0;
   }
-  calcTable()
+  calcTable();
 })
 
 const instabuyCheckbox = document.getElementsByClassName('instabuy')[0];
@@ -139,7 +137,7 @@ instabuyCheckbox.addEventListener('change', (event) => {
   else {
     INSTA_BUY = 0;
   }
-  calcTable()
+  calcTable();
 })
 
 const instasellCheckbox = document.getElementsByClassName('instasell')[0];
@@ -150,7 +148,7 @@ instasellCheckbox.addEventListener('change', (event) => {
   else {
     INSTA_SELL = 1;
   }
-  calcTable()
+  calcTable();
 })
 
 function nbrMinionChanged(event) {
@@ -161,7 +159,7 @@ function nbrMinionChanged(event) {
   else {
     NBR_MINION = parseInt(event.value);
   }
-  calcTable()
+  calcTable();
 }
 
 function calcTable()
@@ -186,8 +184,6 @@ function calcTable()
     timeBetweenActions[a] = timeBetweenActions[a] / (1 + 0.18 * NBR_MINION + INFUS * 0.1 + CATCHER * 0.2 + FREE_WILL * 0.1 + POST_CARD * 0.05); // Time after no-fuels bonus
   }
 
-  //temp
-  speed = timeBetweenActions
   //-------------------- LINE 1 - NO FUEL -------------------
   rows[1].cells[0].innerHTML = "No fuel";
   for (let a = 0; a < 14; a++) {
@@ -202,8 +198,7 @@ function calcTable()
       if (parseFloat(profit) > maxVal)
         maxVal = parseFloat(profit);
       
-      // TODO
-      rows[1].cells[a].innerHTML = profit //numberWithSpaces(profit) impossible de le faire car le gradiant cherche la valeur exacte pour la colorier
+      rows[1].cells[a].innerHTML = profit;
     }
   }
   
@@ -296,7 +291,7 @@ function calcTable()
                   1/458182 * items["REAPER_PEPPER"][INSTA_SELL]
                 ) * rollsRareDrops * (1 + 0.3*EYEDROP) ;
         profit -= 6*items[elements[b][2]][INSTA_BUY] + items["HYPERGOLIC_GABAGOOL"][INSTA_BUY] + 2*items["INFERNO_FUEL_BLOCK"][INSTA_BUY];
-        profit -= EYEDROP * items["CAPSAICIN_EYEDROPS_NO_CHARGES"][INSTA_BUY]
+        profit -= EYEDROP * items["CAPSAICIN_EYEDROPS_NO_CHARGES"][INSTA_BUY];
 
         profit = Math.round(profit*10) / 10;
 
